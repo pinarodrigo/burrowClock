@@ -1,0 +1,15 @@
+<ActionBar title="Settings">
+    <NavigationButton text="Go Back" android.systemIcon="ic_menu_back"></NavigationButton>
+</ActionBar>
+<GridLayout class="page">
+    <StackLayout>
+        <Label text="Name:"></Label>
+        <TextField hint="{{ username }}"
+           secure="false"
+           returnKeyType="done" 
+           (returnPress)="onReturnPress($event)"
+           (focus)="onFocus($event)" 
+           (blur)="onBlur($event)">
+        </TextField>
+    </StackLayout>
+</GridLayout>
