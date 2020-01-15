@@ -8,15 +8,15 @@
         <StackLayout dock="top" class="form" id="labels">
             <GridLayout class="page" dock="top" rows="*,*,*,*,*,*" columns="100,*">
                     <Label text="Siguiendo a: " row="0" col="0"></Label><Label text="{{username}}" row="0" col="1" id="usernameLabel"></Label>
-                    <Label row="1" col="0" text="Latitude: {{ latitude }}"></Label>
-                    <Label row="1" col="1" text="Longitude: {{ longitude }}"></Label>
             </GridLayout>
+            <Label row="1" col="0" text="Latitude: {{ latitude }}"></Label>
+            <Label row="2" col="0" text="Longitude: {{ longitude }}"></Label>
+            <Button class="btn btn-primary btn-active" text="Initialize" (tap)="updateLocation()"></Button>
+            <Button class="btn btn-primary btn-active" text="Start Tracking" (tap)="startWatchingLocation()"></Button>
+            <Button class="btn btn-primary btn-active" text="Stop Tracking" (tap)="stopWatchingLocation()"></Button>
         </StackLayout>
     </ScrollView>
     <StackLayout>
-        <Button class="btn btn-primary btn-active" text="Update" (tap)="updateLocation()"></Button>
-        <Button class="btn btn-primary btn-active" text="Start Tracking" (tap)="startWatchingLocation()"></Button>
-        <Button class="btn btn-primary btn-active" text="Stop Tracking" (tap)="stopWatchingLocation()"></Button>
     </StackLayout>
     <app-bartop dock="bottom"></app-bartop>
 </DockLayout>

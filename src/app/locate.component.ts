@@ -1,10 +1,9 @@
 import { Component, NgZone, AfterViewInit } from "@angular/core";
 import { RouterExtensions } from 'nativescript-angular/router/router-extensions';
 import * as Geolocation from "nativescript-geolocation";
-import { MyHttpPostService } from "./http-post.service";
-import { MyHttpPutService } from "./http-put.service";
+import { MyHttpService } from "./http.service";
 import { getString } from "tns-core-modules/application-settings";
-import { Router, Event, NavigationEnd} from '@angular/router';
+import { Router, Event, NavigationEnd } from '@angular/router';
 import { Page, Observable, EventData } from "tns-core-modules/ui/page/page";
 import { Label } from "tns-core-modules/ui/label";
 import { StackLayout } from "tns-core-modules/ui/layouts/stack-layout";
@@ -12,9 +11,9 @@ import { StackLayout } from "tns-core-modules/ui/layouts/stack-layout";
 @Component({
     selector: "my-app",
     templateUrl: "locate.component.html",
-    providers: [MyHttpPostService, MyHttpPutService]
+    providers: [MyHttpService]
 })
-export class LocateComponent implements AfterViewInit{
+export class LocateComponent implements AfterViewInit {
 
     public latitude: number;
     public longitude: number;
@@ -22,11 +21,11 @@ export class LocateComponent implements AfterViewInit{
     public message: string = "";
     public username: string;
 
-    public constructor(private page:Page, private burrowPostService: MyHttpPostService, private burrowPutService: MyHttpPutService, public nav: RouterExtensions, private router:Router, public zone: NgZone) {
+    public constructor(private page: Page, private burrowHTTPService: MyHttpService, public nav: RouterExtensions, private router: Router, public zone: NgZone) {
         this.latitude = 0;
         this.longitude = 0;
 
-        this.page.on(Page.navigatingToEvent, function(args: EventData){
+        this.page.on(Page.navigatingToEvent, function (args: EventData) {
             const page = <Page>args.object;
             const container = <StackLayout>page.getViewById("container");
             const vm = new Observable();
@@ -58,7 +57,7 @@ export class LocateComponent implements AfterViewInit{
         this.getDeviceLocation().then(result => {
             this.latitude = result.latitude;
             this.longitude = result.longitude;
-            this.makePostRequest(result.latitude, result.longitude);
+            this.makeRequest("post", result.latitude, result.longitude);
 
             console.log("Device Location: " + this.latitude + ", " + this.longitude);
         }, error => {
@@ -73,7 +72,7 @@ export class LocateComponent implements AfterViewInit{
                     this.latitude = location.latitude;
                     this.longitude = location.longitude;
                 });
-                this.makePutRequest(location.latitude, location.longitude);
+                this.makeRequest("put", location.latitude, location.longitude);
                 console.log("Device Location updated: " + this.latitude + ", " + this.longitude);
             }
         }, error => {
@@ -88,20 +87,25 @@ export class LocateComponent implements AfterViewInit{
         }
     }
 
-    private makePostRequest(lat, lon) {
-        this.burrowPostService
-            .postData({ name: "regina", latitude: "" + lat, longitude: "" + lon })
-            .subscribe(res => {
-                this.message = "";
-            });
-    }
+    private makeRequest(method: string, lat: string | number, lon: string | number) {
+        var content = { name: "" + getString("username").toLowerCase(), latitude: "" + lat, longitude: "" + lon };
 
-    private makePutRequest(lat, lon) {
-        this.burrowPutService
-            .putData({ name: "regina", latitude: "" + lat, longitude: "" + lon })
-            .subscribe(res => {
-                this.message = "";
-            });
+        if (method == "post") {
+            this.burrowHTTPService
+                .postData(content)
+                .subscribe(res => {
+                    console.log(JSON.stringify(res));
+                });
+        } else if (method == "put") {
+            this.burrowHTTPService
+                .putData(content)
+                .subscribe(res => {
+                    console.log(JSON.stringify(res));
+                });
+        } else {
+            console.error("HTTP Method not supported");
+        }
+
     }
 
     public navigateTo(page) {
